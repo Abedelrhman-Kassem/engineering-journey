@@ -14,15 +14,15 @@ AI participates in exactly one role here: as a **strict senior reviewer**. It as
 
 A 13-phase curriculum, small daily tasks growing into feature-sized work — tracked task-by-task in **[ROADMAP.md](ROADMAP.md)**:
 
-| Phases | Focus |
-|--------|-------|
-| 0–2 | Git discipline, Clean Architecture, ASP.NET Core pipeline (middleware, filters, DI) |
-| 3–4 | EF Core + PostgreSQL, REST API craft |
-| 5–7 | Concurrency, security (JWT, RBAC), performance & caching |
-| 8–10 | DDD, CQRS, multi-tenancy, feature flags, idempotency, background processing |
-| 11–12 | Testing depth, Docker, observability, CI/CD |
+| Phases | Focus                                                                               |
+| ------ | ----------------------------------------------------------------------------------- |
+| 0–2    | Git discipline, Clean Architecture, ASP.NET Core pipeline (middleware, filters, DI) |
+| 3–4    | EF Core + PostgreSQL, REST API craft                                                |
+| 5–7    | Concurrency, security (JWT, RBAC), performance & caching                            |
+| 8–10   | DDD, CQRS, multi-tenancy, feature flags, idempotency, background processing         |
+| 11–12  | Testing depth, Docker, observability, CI/CD                                         |
 
-Every task = feature branch → Conventional Commits → PR-style review (scored ★ across architecture, readability, security, performance, testability...) → 3–5 senior interview questions. Tasks don't pass until both the code *and* the understanding do.
+Every task = feature branch → Conventional Commits → PR-style review (scored ★ across architecture, readability, security, performance, testability...) → 3–5 senior interview questions. Tasks don't pass until both the code _and_ the understanding do.
 
 ### Guiding principle: built-in first, library second
 
@@ -47,4 +47,6 @@ Every cross-cutting concern is first implemented with raw BCL/ASP.NET Core primi
 
 ---
 
-*This README describes the journey. The product-focused README with architecture diagrams and ADRs arrives at the end of Phase 12 — written by hand, like everything else.*
+_This README describes the journey. The product-focused README with architecture diagrams and ADRs arrives at the end of Phase 12 — written by hand, like everything else._
+
+add test
