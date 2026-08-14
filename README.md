@@ -49,4 +49,4 @@ Every cross-cutting concern is first implemented with raw BCL/ASP.NET Core primi
 
 _This README describes the journey. The product-focused README with architecture diagrams and ADRs arrives at the end of Phase 12 — written by hand, like everything else._
 
-add test
+the CI now is working on main branch for push, pull_request has checkout, restore then build, in future it will haave test, coverage, cache, publish
