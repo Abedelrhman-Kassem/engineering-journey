@@ -9,6 +9,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
       - name: checkout Repo
@@ -23,6 +25,3 @@ jobs:
 
       - name: Build
         run: dotnet build --no-restore --configuration Release
-
-permissions:
-  contents: read
