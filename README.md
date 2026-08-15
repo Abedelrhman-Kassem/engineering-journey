@@ -45,8 +45,26 @@ Every cross-cutting concern is first implemented with raw BCL/ASP.NET Core primi
 - 📜 [.claude/PLAN.md](.claude/PLAN.md) — the full mentorship contract
 - 🌳 The commit history itself — it's part of the curriculum (Conventional Commits, feature branches, clean history from commit #1)
 
----
+## CI
+
+Every push to `main` and every pull request targeting `main` runs [`.github/workflows/ci.yaml`](.github/workflows/ci.yaml) on a clean Ubuntu runner: checkout → install the .NET 10 SDK → `dotnet restore` → `dotnet build --configuration Release`. `main` is branch-protected and this build is a required check, so a red run blocks the merge button rather than merely embarrassing me.
+
+Two deliberate details: the build runs in **Release**, the configuration that actually ships, not the one that's convenient locally. And restore is its own step, with `--no-restore` on the build — so a dependency problem reads as a dependency problem in the log instead of hiding inside a build failure.
+
+Warnings fail the build. TreatWarningsAsErrors lives in Directory.Build.props rather than as a CI flag, so it binds locally as well — a warning breaks my build before it ever reaches a runner. Adopted now, at zero warnings, because the price of this policy only ever goes up.
+
+What it deliberately does **not** do yet:
+
+| Not here                  | Why not                                                                                                                                                  |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Test step                 | There are no test projects yet. Phase 3 adds them, and this workflow grows then.                                                                         |
+| Coverage reporting        | Nothing to cover. A coverage badge over zero tests is a lie told in green.                                                                               |
+| NuGet caching             | A cold restore costs ~30 seconds. Caching buys back seconds nobody is waiting on, in exchange for a cache key to maintain and stale-cache bugs to debug. |
+| OS / SDK matrix           | One target SDK, deployed to Linux. A three-OS matrix would triple the bill to test platforms this project never runs on.                                 |
+| Publish / Docker / deploy | Nothing to deploy yet. That arrives with Phase 11.                                                                                                       |
+
+Each of those is a real cost, not an oversight. They get added when I can name the failure each one prevents.
+
+This workflow has never gone red — not because it was written carefully, but because it never names the solution file. `dotnet restore` with no argument discovers `Q&A.slnx` on its own, so the `&` never reaches a shell that would read it as "run in background." Path casing across the six projects _was_ tested by the Linux runner, and passed. The quoting trap is still there, waiting for the first step that takes a path.
 
 _This README describes the journey. The product-focused README with architecture diagrams and ADRs arrives at the end of Phase 12 — written by hand, like everything else._
-
-the CI now is working on main branch for push, pull_request has checkout, restore then build, in future it will haave test, coverage, cache, publish
