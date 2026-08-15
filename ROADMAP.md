@@ -15,7 +15,7 @@
 - [x] **0.2** ✅ Feature-branch workflow + first GitHub PR (fixed NU1903 vuln via direct package override; learned the one-branch-one-PR-one-merge rule the hard way)
 - [x] **0.3** ✅ Merge vs rebase — did both on `exp/merge-demo` (merge commit, then reset + rebase to linearize); golden rule, reflog recovery, fast-forward vs `--no-ff`, squash ≠ `--no-ff`, revertability as the reason to keep merge commits
 - [x] **0.4** ✅ Damage control essentials: `revert` + `stash` — non-tip revert, merge revert with correct mainline (`-m 1`), revert-the-revert proven by identical tree hashes, why re-merging after a revert doesn't restore the work; `stash -u`, `pop` vs `apply` (reflog/reset already learned in 0.1 — the hard way 😄)
-- [ ] **0.5** Minimal CI: GitHub Actions workflow that builds the solution on every push/PR
+- [x] **0.5** ✅ Minimal CI: GitHub Actions workflow building the solution on push to `main` + PRs — job-scoped `permissions`, `restore`/`build --no-restore` split, Release config, branch protection with `build` as a required check; `TreatWarningsAsErrors` in `Directory.Build.props` (binds locally *and* in CI, not just a CI flag); README documents what CI deliberately does **not** do yet and why
 
 ## Phase 1 — Architecture Fundamentals
 
