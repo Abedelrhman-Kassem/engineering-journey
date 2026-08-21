@@ -19,7 +19,7 @@
 
 ## Phase 1 — Architecture Fundamentals
 
-- [ ] **1.1** Explain the current solution layout: what belongs in each layer — written as a short ARCHITECTURE.md
+- [x] **1.1** ✅ `ARCHITECTURE.md` — six projects documented (what lives here / never / may reference), dependency rule pointing inward at `Domain` with `Domain.Shared` as a shared kernel outside the ordering, audit table of every current reference, concrete example type per project. Reasoning earned: the deletion test justifying `Domain.Shared` (Contract would have to see `Domain`, DTOs one `using` from leaking entities), interfaces split by who they face (inbound → `Contract`, outbound like `IEmailSender` → `Application`), Application *consumes* the domain model but never shapes it, `Host → Infrastructure` as the deliberate composition-root exception
 - [ ] **1.2** Enforce the dependency rule: fix project references so dependencies point inward only; justify each
 - [ ] **1.3** Composition root: Host as the only place that wires everything; DI registration strategy
 

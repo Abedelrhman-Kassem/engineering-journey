@@ -73,21 +73,20 @@ Interfaces are split by who they face. `Application.Contract` holds the interfac
 | ------------------------------------ | ------------ | ------------------- |
 | Host → Application                   | ✅           | ✅                  |
 | Host → Infrastructure                | ✅           | ✅ composition root |
-| Host → Application.Contract          | ✅           | ✅ — but redundant  |
 | Application → Application.Contract   | ✅           | ✅                  |
-| Application → Domain                 | ❌           | ✅ — must be added  |
+| Application → Domain                 | ✅           | ✅                  |
 | Infrastructure → Application         | ✅           | ✅                  |
 | Infrastructure → Domain              | ✅           | ✅                  |
 | Domain → Domain.Shared               | ✅           | ✅                  |
 | Application.Contract → Domain.Shared | ✅           | ✅                  |
 
-**No reference in this solution violates the dependency rule** — every arrow already points inward. The audit turns up two defects of a different kind.
+The graph now matches the rule. Two defects were found and corrected.
 
-`Application → Domain` is **missing**. Handlers are supposed to orchestrate entities, and right now `Application` cannot see a single one.
+`Application → Domain` was **missing**. Handlers are meant to orchestrate entities, and `Application` could not see a single one. Added.
 
-`Host → Application.Contract` is **legal but redundant**. `Host` will always reference `Application`, and `Application` will always reference `Application.Contract`, so the contracts are reachable along a path this solution controls at both ends. An explicit reference here states something already guaranteed, so it is dropped.
+`Host → Application.Contract` was **legal but redundant** — it pointed inward, so it broke no rule, but it stated something already guaranteed. `Host` will always reference `Application`, and `Application` will always reference `Application.Contract`, so the contracts stay reachable along a path this solution controls at both ends. Removed.
 
-Neither is corrected by this document — writing down what is true comes first. Task 1.2 makes the changes.
+That second decision is **not yet proven**. Dropping the reference compiled immediately only because `Host` has no controllers — nothing in it consumes a DTO today. The first controller that takes a `CreateQuestionDto` is the real test, and it arrives in Phase 4. If the transitive path ever fails, this is the line to revisit.
 
 ## What each project holds, concretely
 
