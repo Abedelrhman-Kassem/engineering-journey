@@ -88,6 +88,14 @@ The graph now matches the rule. Two defects were found and corrected.
 
 That second decision is **not yet proven**. Dropping the reference compiled immediately only because `Host` has no controllers — nothing in it consumes a DTO today. The first controller that takes a `CreateQuestionDto` is the real test, and it arrives in Phase 4. If the transitive path ever fails, this is the line to revisit.
 
+## Enforcing this rule
+
+Libraries such as `NetArchTest` and `ArchUnitNET` can fail a build when a forbidden reference appears. The question is whether this repo needs one yet.
+
+Most violations of the dependency rule cannot happen here at all: they would point back at a project that already references the offender, and MSBuild refuses to build a circular reference. For those, the compiler is already the enforcement mechanism, and a test would add nothing. Exactly one violation compiles silently — `Application.Contract → Domain`. It creates no cycle, so the build stays green, CI stays green, and nothing else is watching: this repo has one contributor and no second reviewer on its pull requests. It would also be added for a *plausible* reason — "`Domain` is the core, so every project should reference it", which is true for `Application` and `Infrastructure` and wrong for `Application.Contract`, the one project that exists so DTOs cannot see entities. `git reset` and `git revert` are no defence here, because they repair a mistake that has been noticed, and this mistake is never noticed.
+
+**Decision: not yet — until the solution has a test project, which arrives in Phase 3.** The assertion itself is a few lines. Today it would mean standing up the first test project in the solution to hold a single check, ahead of the phase where testing is introduced. Once that project exists the marginal cost is close to zero and the test is worth adding; adding it now would be solving the right problem in the wrong order.
+
 ## What each project holds, concretely
 
 | Project                | Example                 |
