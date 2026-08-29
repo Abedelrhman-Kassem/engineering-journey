@@ -2,13 +2,13 @@
 
 namespace Host.Middlewares;
 
-public static class  RequestLoggingMiddlewareExtensions
+public static class RequestLoggingMiddlewareExtensions
 {
     public static IApplicationBuilder UseRequestLogging(this IApplicationBuilder app)
     {
         return app.UseMiddleware<RequestLoggingMiddleware>();
     }
-    
+
 }
 
 public sealed class RequestLoggingMiddleware(RequestDelegate next, ILogger<RequestLoggingMiddleware> logger)
@@ -33,11 +33,7 @@ public sealed class RequestLoggingMiddleware(RequestDelegate next, ILogger<Reque
             }
             finally
             {
-                if (context.Response.StatusCode == 200)
-                {
-                    logger.LogInformation("Health Check Status Code: {StatusCode}", context.Response.StatusCode);
-                } 
-                else
+                if (context.Response.StatusCode >= 400)
                 {
                     logger.LogCritical("Health Check {StatusCode}", context.Response.StatusCode);
                 }
@@ -47,13 +43,19 @@ public sealed class RequestLoggingMiddleware(RequestDelegate next, ILogger<Reque
         }
 
         var elapsedTime = Stopwatch.StartNew();
+        try
+        {
+            await next(context);
+        }
+        finally
+        {
+            var elapsedMilliseconds = elapsedTime.ElapsedMilliseconds;
 
-        await next(context);
+            logger.LogInformation("Request: {Method} {Path} completed in {ElapsedMilliseconds} ms with status code {StatusCode}",
+                method, path, elapsedMilliseconds, context.Response.StatusCode);
+        }
 
-        var elapsedMilliseconds = elapsedTime.ElapsedMilliseconds;
 
-        logger.LogInformation("Request: {Method} {Path} completed in {ElapsedMilliseconds} ms with status code {StatusCode}",
-            method, path, elapsedMilliseconds, context.Response.StatusCode);
 
     }
 
