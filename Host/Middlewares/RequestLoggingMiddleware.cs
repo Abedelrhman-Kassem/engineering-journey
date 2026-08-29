@@ -11,7 +11,7 @@ public static class  RequestLoggingMiddlewareExtensions
     
 }
 
-public class RequestLoggingMiddleware(RequestDelegate next, ILogger<RequestLoggingMiddleware> logger)
+public sealed class RequestLoggingMiddleware(RequestDelegate next, ILogger<RequestLoggingMiddleware> logger)
 {
 
     public async Task InvokeAsync(HttpContext context)
@@ -27,14 +27,20 @@ public class RequestLoggingMiddleware(RequestDelegate next, ILogger<RequestLoggi
 
         if (context.Request.Path.StartsWithSegments("/health"))
         {
-            await next(context);
-            if (context.Response.StatusCode == 200)
+            try
             {
-                logger.LogInformation("Health Check Status Code: {StatusCode}", context.Response.StatusCode);
-            } 
-            else
+                await next(context);
+            }
+            finally
             {
-                logger.LogCritical("Health Check {StatusCode}", context.Response.StatusCode);
+                if (context.Response.StatusCode == 200)
+                {
+                    logger.LogInformation("Health Check Status Code: {StatusCode}", context.Response.StatusCode);
+                } 
+                else
+                {
+                    logger.LogCritical("Health Check {StatusCode}", context.Response.StatusCode);
+                }
             }
 
             return;
