@@ -13,8 +13,12 @@ public static class  RequestLoggingMiddlewareExtensions
 
 public class RequestLoggingMiddleware(RequestDelegate next, ILogger<RequestLoggingMiddleware> logger)
 {
+
     public async Task InvokeAsync(HttpContext context)
     {
+        var method = context.Request.Method;
+        var path = context.Request.Path;
+
         if (IsSwaggerOrScalarRequest(context))
         {
             await next(context);
@@ -43,7 +47,7 @@ public class RequestLoggingMiddleware(RequestDelegate next, ILogger<RequestLoggi
         var elapsedMilliseconds = elapsedTime.ElapsedMilliseconds;
 
         logger.LogInformation("Request: {Method} {Path} completed in {ElapsedMilliseconds} ms with status code {StatusCode}",
-            context.Request.Method, context.Request.Path, elapsedMilliseconds, context.Response.StatusCode);
+            method, path, elapsedMilliseconds, context.Response.StatusCode);
 
     }
 
