@@ -23,6 +23,7 @@ public class RequestLoggingMiddleware(RequestDelegate next, ILogger<RequestLoggi
 
         if (context.Request.Path.StartsWithSegments("/health"))
         {
+            await next(context);
             if (context.Response.StatusCode == 200)
             {
                 logger.LogInformation("Health Check Status Code: {StatusCode}", context.Response.StatusCode);
@@ -31,17 +32,18 @@ public class RequestLoggingMiddleware(RequestDelegate next, ILogger<RequestLoggi
             {
                 logger.LogCritical("Health Check {StatusCode}", context.Response.StatusCode);
             }
-            await next(context);
+
+            return;
         }
 
         var elapsedTime = Stopwatch.StartNew();
 
-        logger.LogInformation("Request: {Method} {Path}", context.Request.Method, context.Request.Path);
-        //await next(context);
-        logger.LogInformation("Status Code: {StatusCode}", context.Response.StatusCode);
+        await next(context);
 
         var elapsedMilliseconds = elapsedTime.ElapsedMilliseconds;
-        logger.LogInformation("Elapsed Time: {ElapsedMilliseconds} ms", elapsedMilliseconds);
+
+        logger.LogInformation("Request: {Method} {Path} completed in {ElapsedMilliseconds} ms with status code {StatusCode}",
+            context.Request.Method, context.Request.Path, elapsedMilliseconds, context.Response.StatusCode);
 
     }
 

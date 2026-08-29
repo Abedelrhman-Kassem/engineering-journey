@@ -1,7 +1,5 @@
 using Host.Middlewares;
 using Infrastructure;
-using Scalar.AspNetCore;
-using System.Diagnostics;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,17 +16,6 @@ builder.Services.AddInfrastructure();
 
 var app = builder.Build();
 
-//app.Use(async (context, next) =>
-//{
-//    var elapsedTime = Stopwatch.StartNew();
-
-//    Console.WriteLine($"Request: {context.Request.Method} {context.Request.Path}");
-//    await next();
-//    Console.WriteLine($"Status Code: {context.Response.StatusCode}");
-
-//    var elapsedMilliseconds = elapsedTime.ElapsedMilliseconds;
-//    Console.WriteLine($"Elapsed Time: {elapsedMilliseconds} ms");
-//});
 
 
 // Configure the HTTP request pipeline.
@@ -36,7 +23,6 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 
-    app.MapScalarApiReference();
 
     app.UseSwagger();
     app.UseSwaggerUI();
@@ -44,10 +30,9 @@ if (app.Environment.IsDevelopment())
     app.MapGet("/", () => Results.Redirect("/swagger"));
 }
 
-app.UseHttpsRedirection();
 app.UseRequestLogging();
+app.UseHttpsRedirection();
 
-app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapGet("/test", () => "Hello, World!");
