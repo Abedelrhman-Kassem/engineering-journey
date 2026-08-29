@@ -19,7 +19,7 @@ public sealed class RequestLoggingMiddleware(RequestDelegate next, ILogger<Reque
         var method = context.Request.Method;
         var path = context.Request.Path;
 
-        if (IsSwaggerOrScalarRequest(context))
+        if (IsSwagger(context))
         {
             await next(context);
             return;
@@ -42,14 +42,14 @@ public sealed class RequestLoggingMiddleware(RequestDelegate next, ILogger<Reque
             return;
         }
 
-        var elapsedTime = Stopwatch.StartNew();
+        var timer = Stopwatch.StartNew();
         try
         {
             await next(context);
         }
         finally
         {
-            var elapsedMilliseconds = elapsedTime.ElapsedMilliseconds;
+            var elapsedMilliseconds = timer.ElapsedMilliseconds;
 
             logger.LogInformation("Request: {Method} {Path} completed in {ElapsedMilliseconds} ms with status code {StatusCode}",
                 method, path, elapsedMilliseconds, context.Response.StatusCode);
@@ -59,9 +59,9 @@ public sealed class RequestLoggingMiddleware(RequestDelegate next, ILogger<Reque
 
     }
 
-    private static bool IsSwaggerOrScalarRequest(HttpContext context)
+    private static bool IsSwagger(HttpContext context)
     {
-        return context.Request.Path.StartsWithSegments("/swagger") || context.Request.Path.StartsWithSegments("/scalar");
+        return context.Request.Path.StartsWithSegments("/swagger");
     }
 }
 
