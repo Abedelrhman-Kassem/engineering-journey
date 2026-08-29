@@ -96,6 +96,28 @@ Most violations of the dependency rule cannot happen here at all: they would poi
 
 **Decision: not yet — until the solution has a test project, which arrives in Phase 3.** The assertion itself is a few lines. Today it would mean standing up the first test project in the solution to hold a single check, ahead of the phase where testing is introduced. Once that project exists the marginal cost is close to zero and the test is worth adding; adding it now would be solving the right problem in the wrong order.
 
+## The composition root
+
+`Host` is the only project that binds an abstraction to an implementation. Every layer that has something to register exposes exactly one public entry point — `AddInfrastructure` today — and `Program.cs` calls it. Nothing else in the solution touches the container.
+
+**A layer earns a registration method by having something to register.** `Infrastructure` has earned one, and the benefit is provable rather than stylistic: `EmailSender` is `internal sealed`, so naming it from `Host` fails to compile — `CS0246: the type or namespace name 'EmailSender' could not be found`. From `Host`'s position the type does not merely resist use, it does not exist. Without `AddInfrastructure` the implementation would have to be `public` so that `Host` could name it, and every layer would gain reach it has no business having. `Application` has not earned one. It owns the `IEmailSender` port but implements nothing, so it registers nothing, and an `Add` method that returns the collection unchanged is a method the next reader must open before discovering it does nothing.
+
+**Referencing a DI package is not a violation of the dependency rule.** The rule orders *layers*; `Microsoft.Extensions.DependencyInjection.Abstractions` is a package, and no arrow turns outward because of it. What is given up is smaller, and worth naming rather than waving away: a layer that exposes a registration method now assumes a DI container exists. That assumption would have to be unwound if the layer were ever hosted without one. The trade is accepted because it buys `internal` implementations — a compile-time guarantee instead of a convention.
+
+**Packages are declared by the project that uses them.** `Infrastructure` declares the DI and configuration abstractions because `Infrastructure` is what uses them. It had been reaching them transitively through `Application`, which compiled perfectly well, but left `Application`'s package list load-bearing for a project that is not `Application` — a change there would have broken a file nobody had touched.
+
+**Lifetime.** `IEmailSender` is a singleton. The implementation holds no state between calls and depends on nothing scoped, so a per-request instance would be allocated and discarded for nothing. The second half of that test is the half that matters later: a singleton which captures a scoped dependency keeps the first one it is handed, for the life of the process.
+
+**Configuration enters at the composition root.** `Host` owns `appsettings.json` and passes `IConfiguration` to each layer's registration method, so a layer reads its own settings once, while it is being wired. Services themselves must not take `IConfiguration` as a constructor dependency: a misspelled key would then surface at the first call rather than at startup, and nothing about the class would declare what settings it needs. Strongly-typed options with validate-on-start replace this in Task 2.6. The direction is decided but not yet exercised — nothing in `Infrastructure` reads a setting today.
+
+### Should registration be automatic?
+
+`Scrutor` can scan an assembly and register every type matching a convention. Against one registered service it would trade an explicit line for a rule the reader has to know.
+
+Registration stays manual, and the trigger to revisit that is observable: **when adding a feature forces an edit to `DependencyInjection.cs` every single time.** Phases 3 and 9 bring repositories and handlers; that is when the ratio changes, and it can be checked rather than felt.
+
+One boundary survives that trigger. Scanning suits registrations that carry no decision — the fiftieth `AddScoped<IThingRepository, ThingRepository>()` is noise, and a convention states it better than a line does. Registrations that carry a decision are a different case. A keyed strategy — one interface, three implementations, each resolved by its key — cannot be expressed by a scanner at all, because a scanner reads types and has no way to know which key was meant. The workarounds are to attribute each implementation, which teaches the implementation about the container and undoes exactly what `internal` bought, or to split registration between a scan and a hand-written list, leaving the reader two places to look. Those registrations stay explicit whatever else is scanned.
+
 ## What each project holds, concretely
 
 | Project                | Example                 |
