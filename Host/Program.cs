@@ -1,3 +1,4 @@
+using Host.Middlewares;
 using Infrastructure;
 using Scalar.AspNetCore;
 using System.Diagnostics;
@@ -17,17 +18,18 @@ builder.Services.AddInfrastructure();
 
 var app = builder.Build();
 
-app.Use(async (context, next) =>
-{
-    var elapsedTime = Stopwatch.StartNew();
-    
-    Console.WriteLine($"Request: {context.Request.Method} {context.Request.Path}");
-    await next();
-    Console.WriteLine($"Status Code: {context.Response.StatusCode}");
+//app.Use(async (context, next) =>
+//{
+//    var elapsedTime = Stopwatch.StartNew();
 
-    var elapsedMilliseconds = elapsedTime.ElapsedMilliseconds;
-    Console.WriteLine($"Elapsed Time: {elapsedMilliseconds} ms");
-});
+//    Console.WriteLine($"Request: {context.Request.Method} {context.Request.Path}");
+//    await next();
+//    Console.WriteLine($"Status Code: {context.Response.StatusCode}");
+
+//    var elapsedMilliseconds = elapsedTime.ElapsedMilliseconds;
+//    Console.WriteLine($"Elapsed Time: {elapsedMilliseconds} ms");
+//});
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -43,9 +45,12 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseRequestLogging();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapGet("/test", () => "Hello, World!");
 
 app.MapControllers();
 
