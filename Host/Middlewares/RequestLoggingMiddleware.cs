@@ -37,7 +37,7 @@ public class RequestLoggingMiddleware(RequestDelegate next, ILogger<RequestLoggi
         var elapsedTime = Stopwatch.StartNew();
 
         logger.LogInformation("Request: {Method} {Path}", context.Request.Method, context.Request.Path);
-        await next(context);
+        //await next(context);
         logger.LogInformation("Status Code: {StatusCode}", context.Response.StatusCode);
 
         var elapsedMilliseconds = elapsedTime.ElapsedMilliseconds;
