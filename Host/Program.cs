@@ -41,7 +41,6 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
-app.MapGet("/test", () => {throw new Exception("Test exception");});
 
 app.MapControllers();
 

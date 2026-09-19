@@ -23,12 +23,12 @@ public sealed class GlobalExceptionHandlerMiddleware(RequestDelegate next, ILogg
             if (ex is OperationCanceledException && context.RequestAborted.IsCancellationRequested)
             {
                 logger.LogInformation("Request was canceled by the client.");
-                context.Response.StatusCode = StatusCodes.Status499ClientClosedRequest; 
+                context.Response.StatusCode = StatusCodes.Status499ClientClosedRequest;
                 return;
             }
 
             logger.LogError(ex, "An unhandled exception occurred while processing the request.");
-            
+
             if (context.Response.HasStarted)
             {
                 logger.LogWarning("The response has already started, the global exception handler will not be executed.");
@@ -43,9 +43,13 @@ public sealed class GlobalExceptionHandlerMiddleware(RequestDelegate next, ILogg
                 HttpContext = context,
                 ProblemDetails = new ProblemDetails
                 {
+                    Type = "about:blank",
                     Status = StatusCodes.Status500InternalServerError,
                     Title = "Internal Server Error",
                     Detail = "An unexpected error occurred. Please try again later.",
+                    Extensions =                     {
+                        ["traceId"] = "Hello"
+                    }
                 }
             });
         }
