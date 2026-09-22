@@ -27,7 +27,7 @@ public sealed class GlobalExceptionHandlerMiddleware(RequestDelegate next, ILogg
                 return;
             }
 
-            logger.LogError(ex, "An unhandled exception occurred while processing the request.");
+            logger.LogError(ex, "An unhandled exception occurred while processing the request. TraceId: {TraceId}", Activity.Current?.Id ?? string.Empty);
 
             if (context.Response.HasStarted)
             {
