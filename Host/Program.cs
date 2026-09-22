@@ -1,5 +1,7 @@
+using Application.Interfaces;
 using Host.Middlewares;
 using Infrastructure;
+using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +14,8 @@ builder.Services.AddOpenApi();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddInfrastructure();
+
+builder.Services.AddProblemDetails();
 
 var app = builder.Build();
 
@@ -30,11 +34,13 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseRequestLogging();
+app.UseExceptionHandler();
+
+app.UseGlobalExceptionHandler();
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
-app.MapGet("/test", () => "Hello, World!");
 
 app.MapControllers();
 
