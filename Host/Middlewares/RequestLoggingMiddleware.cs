@@ -52,7 +52,7 @@ public sealed class RequestLoggingMiddleware(RequestDelegate next, ILogger<Reque
             var elapsedMilliseconds = timer.ElapsedMilliseconds;
 
             logger.LogInformation("Request: {Method} {Path} completed in {ElapsedMilliseconds} ms with status code {StatusCode} with traceId {TraceId}",
-                method, path, elapsedMilliseconds, context.Response.StatusCode, Activity.Current?.Id);
+                method, path, elapsedMilliseconds, context.Response.StatusCode, Activity.Current?.Id ?? context.TraceIdentifier);
         }
 
 

@@ -47,9 +47,6 @@ public sealed class GlobalExceptionHandlerMiddleware(RequestDelegate next, ILogg
                     Status = StatusCodes.Status500InternalServerError,
                     Title = "Internal Server Error",
                     Detail = "An unexpected error occurred. Please try again later.",
-                    Extensions =                     {
-                        ["traceId"] = "Hello"
-                    }
                 }
             });
         }
